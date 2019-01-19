@@ -45,7 +45,7 @@ namespace hornets_nest {
 struct CommandLineParam {
     template<typename T, typename R>
     CommandLineParam(graph::GraphStd<T, R>& graph, int argc, char* argv[],
-                     bool exit_if_unknown = true) noexcept;
+                     bool exit_if_unknown = true);
 };
 
 } // namespace hornets_nest

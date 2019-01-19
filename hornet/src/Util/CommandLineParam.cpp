@@ -44,8 +44,7 @@ namespace hornets_nest {
 
 template<typename T, typename R>
 CommandLineParam::CommandLineParam(graph::GraphStd<T, R>& graph,
-                                   int argc, char* argv[], bool exit_if_unknown)
-                                   noexcept {
+                                   int argc, char* argv[], bool exit_if_unknown) {
     using namespace graph::parsing_prop;
     using namespace graph::structure_prop;
     graph::ParsingProp prop(PRINT_INFO);
