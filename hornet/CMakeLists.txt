@@ -1,27 +1,22 @@
-cmake_minimum_required(VERSION 3.8) #language level CUDA support was added in CMake 3.8
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR) #language level CUDA support was added in CMake 3.8
 
 set(PROJECT "Hornet")
-project(${PROJECT} LANGUAGES CXX CUDA)
+project(${PROJECT} LANGUAGES C CXX CUDA)
 
 include(../compiler-util/CMakeLists.txt)
-
-###################################################################################################
-# - include paths ---------------------------------------------------------------------------------
-
-include_directories(include)
 
 ###################################################################################################
 # - library targets -------------------------------------------------------------------------------
 
 if(RMM_LIBRARY)
     add_library(rmm SHARED IMPORTED)
-    set_target_properties(rmm PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/../externals/rmm/build/librmm.so)
+    set_target_properties(rmm PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../externals/rmm/build/librmm.so)
 endif()
 
-file(GLOB_RECURSE CPP_SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
-file(GLOB_RECURSE CU_SRCS  ${PROJECT_SOURCE_DIR}/src/*.cu)
-file(GLOB_RECURSE SCPP_SRCS ${PROJECT_SOURCE_DIR}/../xlib/src/*.cpp)
-file(GLOB_RECURSE SCU_SRCS  ${PROJECT_SOURCE_DIR}/../xlib/src/*.cu)
+file(GLOB_RECURSE CPP_SRCS ${CMAKE_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE CU_SRCS  ${CMAKE_SOURCE_DIR}/src/*.cu)
+file(GLOB_RECURSE SCPP_SRCS ${CMAKE_SOURCE_DIR}/../xlib/src/*.cpp)
+file(GLOB_RECURSE SCU_SRCS  ${CMAKE_SOURCE_DIR}/../xlib/src/*.cu)
 
 add_library(hornet ${CPP_SRCS} ${CU_SRCS} ${SCPP_SRCS} ${SCU_SRCS})
 
@@ -38,23 +33,7 @@ endif()
 ###################################################################################################
 # - add executables -------------------------------------------------------------------------------
 
-add_executable(lb_test            test/BinarySearchTest.cu)
-add_executable(ptxtest            test/ptxtest.cu)
-add_executable(hornet_test        test/HornetTest.cu)
-add_executable(hornet_insert_test test/HornetInsertTest.cu)
-add_executable(hornet_delete_test test/HornetDeleteTest.cu)
-add_executable(mem_benchmark      test/MemBenchmark.cu)
-if(RMM_LIBRARY)
-add_executable(rmm_benchmark      test/RMMBenchmark.cu)
-endif()
-
-target_link_libraries(lb_test            hornet)
-target_link_libraries(ptxtest            hornet)
-target_link_libraries(hornet_test        hornet)
-target_link_libraries(hornet_insert_test hornet)
-target_link_libraries(hornet_delete_test hornet)
-target_link_libraries(mem_benchmark      hornet)
-if(RMM_LIBRARY)
-target_link_libraries(rmm_benchmark      hornet)
-endif()
+if(BUILD_TESTS)
+    add_subdirectory("./tests")
+endif(BUILD_TESTS)
 

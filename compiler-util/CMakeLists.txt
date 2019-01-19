@@ -1,15 +1,29 @@
 ###################################################################################################
 # - set build options -----------------------------------------------------------------------------
 
-set(CUB_LIBRARY ON) # if set to off, some test cases using CUB will not compile.
-set(RMM_LIBRARY OFF) # if set to ON, gpu::allocate invokes RMM_ALLOC, if set to OFF, gpu::allocate invokes cuMalloc (which in turn, invokes cudaMalloc)
+option(CUB_LIBRARY "Configure CMake to use CUB" ON) # if set to off, some test cases using CUB will not compile.
+option(RMM_LIBRARY "Configure CMake to use RMM" ON) # if set to ON, gpu::allocate invokes RMM_ALLOC, if set to OFF, gpu::allocate invokes cuMalloc (which in turn, invokes cudaMalloc)
+option(BUILD_TESTS "Configure CMake to build tests" ON)
 
 ###################################################################################################
 # - cmake modules ---------------------------------------------------------------------------------
 
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake/Modules/" ${CMAKE_MODULE_PATH})
+
 include(FeatureSummary)
 include(CheckIncludeFiles)
 include(CheckLibraryExists)
+
+###################################################################################################
+# - compiler function -----------------------------------------------------------------------------
+
+function(ConfigureTest CMAKE_TEST_NAME CMAKE_TEST_SRC)
+    add_executable(${CMAKE_TEST_NAME} ${CMAKE_TEST_SRC})
+    set_target_properties(${CMAKE_TEST_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    target_link_libraries(${CMAKE_TEST_NAME} gmock gtest gmock_main gtest_main pthread hornet)
+    set_target_properties(${CMAKE_TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/gtests")
+    add_test(NAME ${CMAKE_TEST_NAME} COMMAND ${CMAKE_TEST_NAME})
+endfunction(ConfigureTest)
 
 ###################################################################################################
 # - compiler options ------------------------------------------------------------------------------
@@ -32,13 +46,13 @@ set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -D_GLIBCXX_USE_CXX11_ABI=0"
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode=arch=compute_60,code=sm_60")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode=arch=compute_70,code=sm_70")
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda --expt-relaxed-constexpr")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
 
 # set warnings as errors
 if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall")
 endif(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Werror cross-execution-space-call -Xcompiler -Wall,-Werror")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Werror cross-execution-space-call,deprecated-declarations -Xcompiler -Wall,-Werror") # want to add -Werror reorder as well but this generates errors in including cub, and we may better not modify external library
 
 # set default build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -69,21 +83,39 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 ###################################################################################################
+# - add gtest -------------------------------------------------------------------------------------
+
+if(BUILD_TESTS)
+    include(CTest)
+    include(ConfigureGoogleTest)
+
+    if(GTEST_FOUND)
+        message(STATUS "Google C++ Testing Framework (Google Test) found in ${GTEST_ROOT}")
+        include_directories("${GTEST_INCLUDE_DIR}")
+        link_directories("${GTEST_LIBRARY_DIR}")
+    else()
+        message(AUTHOR_WARNING "Google C++ Testing Framework (Google Test) not found: automated tests are disabled.")
+    endif(GTEST_FOUND)
+endif(BUILD_TESTS)
+
+###################################################################################################
 # - include paths ---------------------------------------------------------------------------------
 
 include_directories("${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}")
-include_directories(../primitives)
-include_directories(../externals/cpp-btree-master)
-include_directories(../xlib/include)
+include_directories("${CMAKE_SOURCE_DIR}/../externals/cpp-btree-master")
+include_directories("${CMAKE_SOURCE_DIR}/../xlib/include")
+include_directories("${CMAKE_SOURCE_DIR}/../primitives")
+include_directories("${CMAKE_SOURCE_DIR}/../hornet/include")
+include_directories("${CMAKE_SOURCE_DIR}/../hornetsnest/include")
 
 if(CUB_LIBRARY)
-    include_directories(../externals/cub-1.8.0)
+    include_directories("${CMAKE_SOURCE_DIR}/../externals/cub-1.8.0")
 endif()
 
 if(RMM_LIBRARY)
-    include_directories(../externals/rmm/include)
-    include_directories(../externals/rmm/src)
-    include_directories(../externals/rmm/thirdparty/cnmem/include)
+    include_directories("${CMAKE_SOURCE_DIR}/../externals/rmm/include")
+    include_directories("${CMAKE_SOURCE_DIR}/../externals/rmm/src")
+    include_directories("${CMAKE_SOURCE_DIR}/../externals/rmm/thirdparty/cnmem/include")
 endif()
 
 ###################################################################################################

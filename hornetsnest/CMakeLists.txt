@@ -1,50 +1,24 @@
-cmake_minimum_required(VERSION 3.8) #language level CUDA support was added in CMake 3.8
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR) #language level CUDA support was added in CMake 3.8
 
 set(PROJECT "HornetAlg")
-project(${PROJECT} LANGUAGES CXX CUDA)
+project(${PROJECT} LANGUAGES C CXX CUDA)
 
 include(../compiler-util/CMakeLists.txt)
 
 add_subdirectory(../hornet build)
 
 ###################################################################################################
-# - include paths ---------------------------------------------------------------------------------
-
-include_directories(../hornet/include)
-include_directories(include)
-
-###################################################################################################
 # - library targets -------------------------------------------------------------------------------
 
-file(GLOB_RECURSE CU_SRCS ${PROJECT_SOURCE_DIR}/src/*)
-file(GLOB_RECURSE CPP_SRCS ${PROJECT_SOURCE_DIR}/externals/xlib/src/*)
+file(GLOB_RECURSE CU_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
+file(GLOB_RECURSE CPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/externals/xlib/src/*)
 
 add_library(hornetAlg ${CU_SRCS})
 
 ###################################################################################################
 # - add executables -------------------------------------------------------------------------------
 
-add_executable(bfs        test/BFSTest.cu)
-add_executable(bfs2       test/BFSTest2.cu)
-add_executable(con-comp   test/CCTest.cu)
-add_executable(spmv       test/SpMVTest.cu)
-add_executable(sssp       test/SSSPTest.cu)
-add_executable(katz       test/KatzTest.cu)
-add_executable(dyn-katz   test/KatzDynamicTest.cu)
-add_executable(triangle   test/TriangleTest.cu)
-add_executable(triangle2  test/TriangleTest2.cu)
-add_executable(clus-coeff test/ClusCoeffTest.cu)
-add_executable(pr         test/PageRankTest.cu)
-
-target_link_libraries(bfs        hornetAlg hornet)
-target_link_libraries(bfs2       hornetAlg hornet)
-target_link_libraries(con-comp   hornetAlg hornet)
-target_link_libraries(spmv       hornetAlg hornet)
-target_link_libraries(sssp       hornetAlg hornet)
-target_link_libraries(katz       hornetAlg hornet)
-target_link_libraries(dyn-katz   hornetAlg hornet)
-target_link_libraries(triangle   hornetAlg hornet)
-target_link_libraries(triangle2  hornetAlg hornet)
-target_link_libraries(clus-coeff hornetAlg hornet)
-target_link_libraries(pr         hornetAlg hornet)
+if(BUILD_TESTS)
+    add_subdirectory("./tests")
+endif(BUILD_TESTS)
 
