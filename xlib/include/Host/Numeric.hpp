@@ -49,15 +49,19 @@ namespace xlib {
 // ==================== CONST EXPR TIME numeric methods ========================
 
 template<typename T>
-constexpr T max(const T& a, const T& b) noexcept;
-
-template<typename T>
+HOST_DEVICE
 constexpr T min(const T& a, const T& b) noexcept;
 
+template<typename T>
+HOST_DEVICE
+constexpr T max(const T& a, const T& b) noexcept;
+
 template<typename T, typename... TArgs>
+HOST_DEVICE
 constexpr T min(const T& a, const T& b, const TArgs&... args) noexcept;
 
 template<typename T, typename... TArgs>
+HOST_DEVICE
 constexpr T max(const T& a, const T& b, const TArgs&... args) noexcept;
 
 template<typename T>

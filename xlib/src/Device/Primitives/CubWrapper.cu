@@ -150,7 +150,7 @@ void CubSpMV<T>::run() noexcept {
 
 template<typename T>
 CubArgMax<T>::CubArgMax(const T* d_in, size_t num_items) noexcept :
-                                    _d_in(d_in), CubWrapper(num_items) {
+                                    CubWrapper(num_items), _d_in(d_in) {
     cub::KeyValuePair<int, T>* d_tmp;
     cuMalloc(d_tmp, 1);
     cub::DeviceReduce::ArgMax(_d_temp_storage, _temp_storage_bytes, _d_in,

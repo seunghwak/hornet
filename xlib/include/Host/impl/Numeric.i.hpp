@@ -86,16 +86,19 @@ void check_overflow(T value) {
 
 //------------------------------------------------------------------------------
 template<typename T>
+HOST_DEVICE
 constexpr T min(const T& a) noexcept {
     return a;
 }
 
 template<typename T>
+HOST_DEVICE
 constexpr T min(const T& a, const T& b) noexcept {
     return a < b ? a : b;
 }
 
 template<typename T, typename... TArgs>
+HOST_DEVICE
 constexpr T min(const T& a, const T& b, const TArgs&... args) noexcept {
     const auto& min_args = xlib::min(args...);
     const auto& min_value = xlib::min(a, b);
@@ -103,16 +106,19 @@ constexpr T min(const T& a, const T& b, const TArgs&... args) noexcept {
 }
 
 template<typename T>
+HOST_DEVICE
 constexpr T max(const T& a) noexcept {
     return a;
 }
 
 template<typename T>
+HOST_DEVICE
 constexpr T max(const T& a, const T& b) noexcept {
     return a > b ? a : b;
 }
 
 template<typename T, typename... TArgs>
+HOST_DEVICE
 constexpr T max(const T& a, const T& b, const TArgs&... args) noexcept {
     const auto&  max_args = xlib::max(args...);
     const auto& max_value = xlib::max(a, b);
@@ -497,8 +503,6 @@ HOST_DEVICE
 typename std::enable_if<xlib::is_power2(BASE), int>::type
 ceil_log_aux(T value) noexcept {
     auto ret = xlib::ceil_div<xlib::Log2<BASE>::value>(xlib::ceil_log2(value));
-    assert(static_cast<T>(std::ceil(std::log2(value) / std::log2(BASE)))
-           == ret);
     return ret;
 }
 
