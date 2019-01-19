@@ -2,62 +2,56 @@
  * @brief Breadth-first Search Top-Down test program
  * @file
  */
-#include "Static/BreadthFirstSearch/TopDown.cuh"
-#include <StandardAPI.hpp>
+
+#include <gtest/gtest.h>
+
 #include <Graph/GraphStd.hpp>
-#include <Util/CommandLineParam.hpp>
-#include <cuda_profiler_api.h> //--profile-from-start off
 
-int exec(int argc, char* argv[]) {
-    using namespace timer;
-    using namespace hornets_nest;
+#include <StandardAPI.hpp>
 
-    graph::GraphStd<vid_t, eoff_t> graph;
-    CommandLineParam cmd(graph, argc, argv,false);
+#include "../../hornet/tests/hornet_test_fixtures.h"
 
+#include "Static/BreadthFirstSearch/TopDown.cuh"
 
-    HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(),
-                           graph.csr_out_edges());
+namespace {
 
-    HornetGraph hornet_graph(hornet_init);
+void exec(const char* p_graph_file_path) {
+    graph::ParsingProp prop(graph::parsing_prop::PRINT_INFO);
+    graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph;
+    graph.read(p_graph_file_path, prop);
 
-    BfsTopDown bfs_top_down(hornet_graph);
+    hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
+    hornets_nest::HornetGraph hornet_graph(hornet_init);
+    hornets_nest::BfsTopDown bfs_top_down(hornet_graph);
 
-    vid_t root = graph.max_out_degree_id();
-    if (argc==3)
-        root = atoi(argv[2]);
-
+    hornets_nest::vid_t root = graph.max_out_degree_id();
     bfs_top_down.set_parameters(root);
 
-    Timer<DEVICE> TM;
-    cudaProfilerStart();
-    TM.start();
+    auto start = std::chrono::high_resolution_clock::now();
 
     bfs_top_down.run();
 
-    TM.stop();
-    cudaProfilerStop();
-    TM.print("TopDown");
+    auto end = std::chrono::high_resolution_clock::now();
 
-    auto is_correct = bfs_top_down.validate();
-    std::cout << (is_correct ? "\nCorrect <>\n\n" : "\n! Not Correct\n\n");
-    return !is_correct;
+    std::chrono::duration<double> diff = end - start;
+    std::cout << "execution time:" << diff.count() * 1000 << " ms" << std::endl;
+
+    ASSERT_TRUE(bfs_top_down.validate());
+
+    return;
 }
 
-int main(int argc, char* argv[]) {
-    int ret = 0;
-#if defined(RMM_WRAPPER)
-    hornets_nest::gpu::initializeRMMPoolAllocation();//update initPoolSize if you know your memory requirement and memory availability in your system, if initial pool size is set to 0 (default value), RMM currently assigns half the device memory.
-    {//scoping technique to make sure that hornets_nest::gpu::finalizeRMMPoolAllocation is called after freeing all RMM allocations.
-#endif
-
-    ret = exec(argc, argv);
-
-#if defined(RMM_WRAPPER)
-    }//scoping technique to make sure that hornets_nest::gpu::finalizeRMMPoolAllocation is called after freeing all RMM allocations.
-    hornets_nest::gpu::finalizeRMMPoolAllocation();
-#endif
-
-    return ret;
 }
+
+class BFSTest : public HornetTestWithParam<const char*> {
+protected:
+};
+
+TEST_P(BFSTest, BFSTopDownTest) {
+    auto p_param = GetParam();
+    static_assert(std::is_same<decltype(p_param), const char*>::value, "param should be const char*");
+    exec(p_param);
+}
+
+INSTANTIATE_TEST_CASE_P(BFSTests, BFSTest, ::testing::Values("../../example/G.mtx", "../../example/rome99.gr"));
 
