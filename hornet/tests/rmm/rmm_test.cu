@@ -35,7 +35,7 @@ void exec() {
 
         if (success == true) {
             auto start = std::chrono::high_resolution_clock::now();
-            for (std::size_t i = 0; i < repeat_cnt; i++) {
+            for (std::size_t i = 0; i < repeat_cnt; ++i) {
                 std::unique_ptr<xlib::byte_t[]> h_p_cpp(new (std::nothrow) xlib::byte_t[size]);//no initialization, should not use std::make_unique here as this enforces initialization and is slower.
                 if (h_p_cpp == nullptr) {
                     std::cout << std::endl;
@@ -53,7 +53,7 @@ void exec() {
 
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
-            for (std::size_t i = 0; i < repeat_cnt; i++) {
+            for (std::size_t i = 0; i < repeat_cnt; ++i) {
                 auto my_new = [](const size_t size) { xlib::byte_t* h_p_cuda; auto result = cudaMallocHost(&h_p_cuda, size); if (result == cudaSuccess) { return static_cast<xlib::byte_t*>(h_p_cuda); } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* h_p_cuda) { SAFE_CALL(cudaFreeHost(h_p_cuda)); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> h_p_cuda(my_new(size), my_del);
@@ -73,7 +73,7 @@ void exec() {
 
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
-            for (std::size_t i = 0; i < repeat_cnt; i++) {
+            for (std::size_t i = 0; i < repeat_cnt; ++i) {
                 auto my_new = [](const size_t size) { xlib::byte_t* d_p_cuda; auto result = cudaMalloc(&d_p_cuda, size); if (result == cudaSuccess) { return static_cast<xlib::byte_t*>(d_p_cuda); } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* d_p_cuda) { SAFE_CALL(cudaFree(d_p_cuda)); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> d_p_cuda(my_new(size), my_del);
@@ -93,7 +93,7 @@ void exec() {
 
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
-            for (std::size_t i = 0; i < repeat_cnt; i++) {
+            for (std::size_t i = 0; i < repeat_cnt; ++i) {
                 auto my_new = [](const size_t size) { xlib::byte_t* d_p_rmm; auto result = RMM_ALLOC(&d_p_rmm, size, 0);/* by default, use the default stream, RMM_ALLOC instead of hornets_nest::gpu::allocate to test return value, gpu::allocate calls std::exit on error */ if (result == RMM_SUCCESS) { return static_cast<xlib::byte_t*>(d_p_rmm); } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* d_p_rmm) { hornets_nest::gpu::free(d_p_rmm); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> d_p_rmm(my_new(size), my_del);
@@ -130,7 +130,7 @@ void exec() {
               << std::setw(16) << "rmmAlloc" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
-    for (size_t i = 0; i < round; i++) {
+    for (size_t i = 0; i < round; ++i) {
         std::cout << std::setw(8)  << xlib::human_readable(min_size << i)
                   << std::setw(16) << v_alloc_time_host_cpp[i]
                   << std::setw(16) << v_alloc_time_host_cuda[i]

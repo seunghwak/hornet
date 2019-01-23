@@ -259,7 +259,7 @@ void exec() {
               << std::setw(20) << "device" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
-    for (size_t i = 0; i < round; i++) {
+    for (size_t i = 0; i < round; ++i) {
         std::cout << std::setw(8)  << xlib::human_readable(min_size << i)
                   << std::setw(20) << v_alloc_time_host_cpp[i]
                   << std::setw(20) << v_alloc_time_host_cuda[i]
@@ -275,7 +275,7 @@ void exec() {
               << std::setw(20) << "device" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
-    for (size_t i = 0; i < round; i++) {
+    for (size_t i = 0; i < round; ++i) {
         std::cout << std::setw(8)  << xlib::human_readable(min_size << i)
                   << std::setw(20)  << v_memset_time_host[i]
                   << std::setw(20)  << v_memset_time_host_page_locked[i]
@@ -291,7 +291,7 @@ void exec() {
               << std::setw(20) << "d=>d" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
-    for (size_t i = 0; i < round; i++) {
+    for (size_t i = 0; i < round; ++i) {
         std::cout << std::setw(8)  << xlib::human_readable(min_size << i)
                   << std::setw(20) << v_copy_time_host_to_device[i]
                   << std::setw(20) << v_copy_time_host_page_locked_to_device[i]
