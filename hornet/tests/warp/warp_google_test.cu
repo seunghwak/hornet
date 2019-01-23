@@ -5,7 +5,7 @@
 
 #include "StandardAPI.hpp"
 
-#include "hornet_test_fixtures.h"
+#include "../hornet_test_fixtures.h"
 
 namespace {
 
