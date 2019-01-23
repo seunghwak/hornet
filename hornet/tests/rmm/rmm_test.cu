@@ -12,6 +12,8 @@
 
 #include "../hornet_test_fixtures.h"
 
+namespace {
+
 void exec() {
 #if defined(RMM_WRAPPER)
     constexpr size_t repeat_cnt = 1;
@@ -144,6 +146,8 @@ void exec() {
 #endif
 
     return;
+}
+
 }
 
 class RMMTest : public HornetTest {

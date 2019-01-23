@@ -13,6 +13,8 @@
 
 #include "../hornet_test_fixtures.h"
 
+namespace {
+
 void exec() {
     constexpr size_t min_size = 1024;
     size_t round = 0;
@@ -356,6 +358,8 @@ void exec() {
     }
 
     return;
+}
+
 }
 
 class MemOpTest : public HornetTest {
