@@ -13,7 +13,7 @@ using timer_duration_t = float;//return type of timer::Timer::duration()
 
 int exec() {
 #if defined(RMM_WRAPPER)
-    constexpr size_t repeat_cnt = 10;
+    constexpr size_t repeat_cnt = 1;
     size_t min_size = 1024;//1KB
     size_t round = 0;
 
