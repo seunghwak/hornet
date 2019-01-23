@@ -69,7 +69,7 @@ template<typename T>
 HOST_DEVICE
 bool constexpr addition_is_safe(T a, T b) noexcept {
     return std::is_integral<T>::value && std::is_unsigned<T>::value ?
-           (a + b) < a : true;
+           (a + b) > a : true;
 }
 
 template<typename T>
