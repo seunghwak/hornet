@@ -58,10 +58,12 @@ int BFSTest::argc = 0;
 char** BFSTest::argv = nullptr;
 
 TEST_F(BFSTest, BFSTopDownTest) {
+    ASSERT_TRUE(BFSTest::argc >= 2);
     exec<hornets_nest::BfsTopDown>(BFSTest::argc, BFSTest::argv);
 }
 
 TEST_F(BFSTest, BFSTopDown2Test) {
+    ASSERT_TRUE(BFSTest::argc >= 2);
     exec<hornets_nest::BfsTopDown2>(BFSTest::argc, BFSTest::argv);
 }
 
