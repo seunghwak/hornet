@@ -9,20 +9,23 @@
 
 #include <StandardAPI.hpp>
 
-#include "../../hornet/tests/hornet_test_fixtures.h"
+#include <Util/CommandLineParam.hpp>
 
 #include "Static/BreadthFirstSearch/TopDown.cuh"
+#include "Static/BreadthFirstSearch/TopDown2.cuh"
+
+#include "../../hornet/tests/hornet_test_fixtures.h"
 
 namespace {
 
-void exec(const char* p_graph_file_path) {
-    graph::ParsingProp prop(graph::parsing_prop::PRINT_INFO);
+template<typename TBfsAlg>
+void exec(int argc, char* argv[]) {
     graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph;
-    graph.read(p_graph_file_path, prop);
+    hornets_nest::CommandLineParam cmd(graph, argc, argv, false);
 
     hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
     hornets_nest::HornetGraph hornet_graph(hornet_init);
-    hornets_nest::BfsTopDown bfs_top_down(hornet_graph);
+    TBfsAlg bfs_top_down(hornet_graph);
 
     hornets_nest::vid_t root = graph.max_out_degree_id();
     bfs_top_down.set_parameters(root);
@@ -44,14 +47,28 @@ void exec(const char* p_graph_file_path) {
 }
 
 class BFSTest : public HornetTestWithParam<const char*> {
+public:
+    static int argc;
+    static char** argv;
+
 protected:
 };
 
-TEST_P(BFSTest, BFSTopDownTest) {
-    auto p_param = GetParam();
-    static_assert(std::is_same<decltype(p_param), const char*>::value, "param should be const char*");
-    exec(p_param);
+int BFSTest::argc = 0;
+char** BFSTest::argv = nullptr;
+
+TEST_F(BFSTest, BFSTopDownTest) {
+    exec<hornets_nest::BfsTopDown>(BFSTest::argc, BFSTest::argv);
 }
 
-INSTANTIATE_TEST_CASE_P(BFSTests, BFSTest, ::testing::Values("../../example/G.mtx", "../../example/rome99.gr"));
+TEST_F(BFSTest, BFSTopDown2Test) {
+    exec<hornets_nest::BfsTopDown2>(BFSTest::argc, BFSTest::argv);
+}
+
+int main(int argc, char* argv[]) {
+    ::testing::InitGoogleTest(&argc, argv);
+    BFSTest::argc = argc;
+    BFSTest::argv = argv;
+    return RUN_ALL_TESTS();
+}
 
