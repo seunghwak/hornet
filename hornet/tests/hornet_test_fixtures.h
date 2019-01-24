@@ -4,6 +4,8 @@
 
 #if defined(RMM_WRAPPER)
 #include <rmm.h>
+
+#include "StandardAPI.hpp"
 #endif
 
 // Base class fixture for Hornet google tests that initializes / finalizes the memory manager

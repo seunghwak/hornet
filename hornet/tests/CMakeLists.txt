@@ -16,14 +16,14 @@ set(WARP_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/warp/warp_test.cu")
 set(RMM_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/rmm/rmm_test.cu")
 #endif
 set(MEM_OP_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/mem_op/mem_op_test.cu")
-#set(LOAD_BALANCE_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/load_balance/load_balance_test.cu")
+set(LOAD_BALANCE_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/load_balance/load_balance_test.cu")
 
 ConfigureTest(WARP_TEST "${WARP_TEST_SRC}" hornet)
 #if(RMM_LIBRARY)
 ConfigureTest(RMM_TEST "${RMM_TEST_SRC}" hornet)
 #endif
 ConfigureTest(MEM_OP_TEST "${MEM_OP_TEST_SRC}" hornet)
-#ConfigureTest(LOAD_BALANCE_TEST "${LOAD_BALANCE_TEST_SRC}")
+ConfigureTest(LOAD_BALANCE_TEST "${LOAD_BALANCE_TEST_SRC}" hornet)
 
 #add_executable(hornet_test        test/HornetTest.cu)
 #add_executable(hornet_insert_test test/HornetInsertTest.cu)
