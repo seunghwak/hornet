@@ -11,9 +11,9 @@ include(../../compiler-util/CMakeLists.txt)
 ###################################################################################################
 # - breadth-first-search tests --------------------------------------------------------------------
 
-set(BFS_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/bfs_test.cu")
+set(BFS_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/bfs/bfs_test.cu")
 
-ConfigureTest(BFS_TEST "${BFS_TEST_SRC}")
+ConfigureTest(BFS_TEST "${BFS_TEST_SRC}" hornetAlg)
 
 #add_executable(bfs        test/BFSTest.cu)
 #add_executable(bfs2       test/BFSTest2.cu)

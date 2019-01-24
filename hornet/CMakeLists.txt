@@ -10,13 +10,13 @@ include(../compiler-util/CMakeLists.txt)
 
 if(RMM_LIBRARY)
     add_library(rmm SHARED IMPORTED)
-    set_target_properties(rmm PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../externals/rmm/build/librmm.so)
+    set_target_properties(rmm PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../externals/rmm/build/librmm.so)
 endif()
 
-file(GLOB_RECURSE CPP_SRCS ${CMAKE_SOURCE_DIR}/src/*.cpp)
-file(GLOB_RECURSE CU_SRCS  ${CMAKE_SOURCE_DIR}/src/*.cu)
-file(GLOB_RECURSE SCPP_SRCS ${CMAKE_SOURCE_DIR}/../xlib/src/*.cpp)
-file(GLOB_RECURSE SCU_SRCS  ${CMAKE_SOURCE_DIR}/../xlib/src/*.cu)
+file(GLOB_RECURSE CPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE CU_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu)
+file(GLOB_RECURSE SCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/../xlib/src/*.cpp)
+file(GLOB_RECURSE SCU_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/../xlib/src/*.cu)
 
 add_library(hornet ${CPP_SRCS} ${CU_SRCS} ${SCPP_SRCS} ${SCU_SRCS})
 
