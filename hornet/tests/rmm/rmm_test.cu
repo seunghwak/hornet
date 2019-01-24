@@ -56,7 +56,7 @@ void exec() {
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
             for (std::size_t i = 0; i < repeat_cnt; ++i) {
-                auto my_new = [](const size_t size) { xlib::byte_t* h_p_cuda; auto result = cudaMallocHost(&h_p_cuda, size); if (result == cudaSuccess) { return static_cast<xlib::byte_t*>(h_p_cuda); } else { return static_cast<xlib::byte_t*>(nullptr); } };
+                auto my_new = [](const size_t size) { xlib::byte_t* h_p_cuda = nullptr; auto result = cudaMallocHost(&h_p_cuda, size); if (result == cudaSuccess) { return h_p_cuda; } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* h_p_cuda) { SAFE_CALL(cudaFreeHost(h_p_cuda)); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> h_p_cuda(my_new(size), my_del);
                 if (h_p_cuda == nullptr) {
@@ -76,7 +76,7 @@ void exec() {
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
             for (std::size_t i = 0; i < repeat_cnt; ++i) {
-                auto my_new = [](const size_t size) { xlib::byte_t* d_p_cuda; auto result = cudaMalloc(&d_p_cuda, size); if (result == cudaSuccess) { return static_cast<xlib::byte_t*>(d_p_cuda); } else { return static_cast<xlib::byte_t*>(nullptr); } };
+                auto my_new = [](const size_t size) { xlib::byte_t* d_p_cuda = nullptr; auto result = cudaMalloc(&d_p_cuda, size); if (result == cudaSuccess) { return d_p_cuda; } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* d_p_cuda) { SAFE_CALL(cudaFree(d_p_cuda)); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> d_p_cuda(my_new(size), my_del);
                 if (d_p_cuda == nullptr) {
@@ -96,7 +96,7 @@ void exec() {
         if (success == true ) {
             auto start = std::chrono::high_resolution_clock::now();
             for (std::size_t i = 0; i < repeat_cnt; ++i) {
-                auto my_new = [](const size_t size) { xlib::byte_t* d_p_rmm; auto result = RMM_ALLOC(&d_p_rmm, size, 0);/* by default, use the default stream, RMM_ALLOC instead of hornets_nest::gpu::allocate to test return value, gpu::allocate calls std::exit on error */ if (result == RMM_SUCCESS) { return static_cast<xlib::byte_t*>(d_p_rmm); } else { return static_cast<xlib::byte_t*>(nullptr); } };
+                auto my_new = [](const size_t size) { xlib::byte_t* d_p_rmm = nullptr; auto result = RMM_ALLOC(&d_p_rmm, size, 0);/* by default, use the default stream, RMM_ALLOC instead of hornets_nest::gpu::allocate to test return value, gpu::allocate calls std::exit on error */ if (result == RMM_SUCCESS) { return d_p_rmm; } else { return static_cast<xlib::byte_t*>(nullptr); } };
                 auto my_del = [](xlib::byte_t* d_p_rmm) { hornets_nest::gpu::free(d_p_rmm); };
                 std::unique_ptr<xlib::byte_t[], decltype(my_del)> d_p_rmm(my_new(size), my_del);
                 if (d_p_rmm == nullptr) {
