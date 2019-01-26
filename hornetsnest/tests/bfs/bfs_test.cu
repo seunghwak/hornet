@@ -3,6 +3,9 @@
  * @file
  */
 
+#include <iostream>
+#include <chrono>
+
 #include <gtest/gtest.h>
 
 #include <Graph/GraphStd.hpp>
@@ -25,9 +28,10 @@ void exec(int argc, char* argv[]) {
 
     hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
     hornets_nest::HornetGraph hornet_graph(hornet_init);
+
     TBfsAlg bfs_top_down(hornet_graph);
 
-    hornets_nest::vid_t root = graph.max_out_degree_id();
+    auto root = graph.max_out_degree_id();
     bfs_top_down.set_parameters(root);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -37,7 +41,7 @@ void exec(int argc, char* argv[]) {
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> diff = end - start;
-    std::cout << "execution time:" << diff.count() * 1000 << " ms" << std::endl;
+    std::cout << "Computation time: " << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
 
     ASSERT_TRUE(bfs_top_down.validate());
 
@@ -46,7 +50,7 @@ void exec(int argc, char* argv[]) {
 
 }
 
-class BFSTest : public HornetTestWithParam<const char*> {
+class BFSTest : public HornetTest {
 public:
     static int argc;
     static char** argv;

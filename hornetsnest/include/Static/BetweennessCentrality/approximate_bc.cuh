@@ -56,8 +56,8 @@ public:
     void release()  override;
     bool validate() override;
 
-	static void generateRandomRootsUniform(vid_t nV,vid_t numRoots,
-	vid_t** returnRoots, int randSeed=-1);   
+    static void generateRandomRootsUniform(vid_t nV,vid_t numRoots, vid_t** returnRoots, int randSeed=-1);
+
 private:
 
     vid_t* h_rootIDs;

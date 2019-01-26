@@ -1,30 +1,27 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstdlib>
+#include <chrono>
+#include <iostream>
 
 #include <gtest/gtest.h>
 
+#include <Graph/GraphStd.hpp>
+
+#include <StandardAPI.hpp>
+
 #include "Static/TriangleCounting/triangle.cuh"
 #include "Static/TriangleCounting/triangle2.cuh"
-#include <StandardAPI.hpp>
-#include <Device/Util/Timer.cuh>
-
-#include <Graph/GraphStd.hpp>
 
 #include "../../hornet/tests/hornet_test_fixtures.h"
 
-using namespace std;
-using namespace timer;
-using namespace hornets_nest;
+namespace {
 
-triangle_t hostSingleIntersection (const vid_t* p_start0, const vid_t* p_end0, const vid_t* p_start1, const vid_t* p_end1) {//assume sorted index lists
+hornets_nest::triangle_t hostSingleIntersection (const hornets_nest::vid_t* p_start0, const hornets_nest::vid_t* p_end0, const hornets_nest::vid_t* p_start1, const hornets_nest::vid_t* p_end1) {//assume sorted index lists
     if ((p_start0 == p_end0) || (p_start1 == p_end1) || (*(p_end0 - 1) < *p_start1) || (*(p_end1 - 1) < *p_start0)) {
         return 0;
     }
     else {
-        triangle_t ret = 0;
-        const vid_t* p_cur0 = p_start0;
-        const vid_t* p_cur1 = p_start1;
+        hornets_nest::triangle_t ret = 0;
+        const hornets_nest::vid_t* p_cur0 = p_start0;
+        const hornets_nest::vid_t* p_cur1 = p_start1;
 
         while ((p_cur0 < p_end0) && (p_cur1 < p_end1)) {
             if (*p_cur0 == *p_cur1) {
@@ -44,28 +41,28 @@ triangle_t hostSingleIntersection (const vid_t* p_start0, const vid_t* p_end0, c
     }
 }
 
-triangle_t hostCountTriangles (const vid_t num_vertices, const vid_t num_edges, const eoff_t * p_offsets, const vid_t * p_indices) {
-    triangle_t ret = 0;
-    for (vid_t src = 0; src < num_vertices; ++src) {
-        degree_t src_degree = p_offsets[src + 1] - p_offsets[src];
+hornets_nest::triangle_t hostCountTriangles (const hornets_nest::vid_t num_vertices, const hornets_nest::vid_t num_edges, const hornets_nest::eoff_t * p_offsets, const hornets_nest::vid_t * p_indices) {
+    hornets_nest::triangle_t ret = 0;
+    for (hornets_nest::vid_t src = 0; src < num_vertices; ++src) {
+        hornets_nest::degree_t src_degree = p_offsets[src + 1] - p_offsets[src];
         for (auto nbr_index = p_offsets[src]; nbr_index < p_offsets[src + 1]; ++nbr_index) {
-            vid_t dst = p_indices[nbr_index];
-            degree_t dst_degree = p_offsets[dst + 1] - p_offsets[dst];
+            hornets_nest::vid_t dst = p_indices[nbr_index];
+            hornets_nest::degree_t dst_degree = p_offsets[dst + 1] - p_offsets[dst];
             ret += hostSingleIntersection (p_indices + p_offsets[src], p_indices + p_offsets[src] + src_degree, p_indices + p_offsets[dst], p_indices + p_offsets[dst] + dst_degree);
         }
     }
     return ret;
 }
 
-void execOrg(const int argc, char *argv[]) {//use TriangleCounting and based on the old TriangleCountingTest.cu file.
-    graph::GraphStd<vid_t, eoff_t> graph(graph::structure_prop::UNDIRECTED);
+void execOrg(const int argc, char *argv[]) {//use hornets_nest::TriangleCounting and based on the old TriangleCountingTest.cu file.
+    graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph(graph::structure_prop::UNDIRECTED);
     graph.read(argv[1], graph::parsing_prop::DIRECTED_BY_DEGREE | graph::parsing_prop::SORT | graph::parsing_prop::PRINT_INFO);
 
     auto host_count = hostCountTriangles(graph.nV(), graph.nE(),graph.csr_out_offsets(), graph.csr_out_edges());
-    cout << "host_count=" << host_count << std::endl;
+    std::cout << "host_count=" << host_count << std::endl;
 
-    HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
-    hornets_nest::gpu::Hornet<EMPTY,EMPTY> hornet_graph(hornet_init);
+    hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
+    hornets_nest::gpu::Hornet<std::tuple<>, std::tuple<>> hornet_graph(hornet_init);
 
     hornet_graph.check_sorted_adjs();
 
@@ -74,10 +71,10 @@ void execOrg(const int argc, char *argv[]) {//use TriangleCounting and based on 
     constexpr int tsp = 16;
     constexpr int shifter = 3;
 
-    const std::vector<int> v_cutoff = { -1, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700 };//this is bad... currently, cutoff part is disabled in triangle.cu... also, host_count and device_count do not always match... not sure this is worth debugging... we may just replace TriangleCounting with TriangleCounting2
+    const std::vector<int> v_cutoff = { -1, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700 };//this is bad... currently, cutoff part is disabled in triangle.cu... also, host_count and device_count do not always match... not sure this is worth debugging... we may just replace hornets_nest::TriangleCounting with hornets_nest::TriangleCounting2
 
     for (auto cutoff : v_cutoff) {
-        TriangleCounting tc(hornet_graph);
+        hornets_nest::TriangleCounting tc(hornet_graph);
 
         tc.setInitParameters(blocks,sps,tsp);
         tc.init();
@@ -90,7 +87,7 @@ void execOrg(const int argc, char *argv[]) {//use TriangleCounting and based on 
         auto end = std::chrono::high_resolution_clock::now();
 
         std::chrono::duration<double> diff = end - start;
-        std::cout << "Computation time:" << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
+        std::cout << "Computation time: " << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
 
         auto device_count = tc.countTriangles();
         tc.release();
@@ -102,7 +99,7 @@ void execOrg(const int argc, char *argv[]) {//use TriangleCounting and based on 
 }
 
 void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on the old TriangleCountingTest2.cu file.
-    graph::GraphStd<vid_t, eoff_t> graph(graph::structure_prop::UNDIRECTED);
+    graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph(graph::structure_prop::UNDIRECTED);
     graph.read(argv[1], graph::parsing_prop::DIRECTED_BY_DEGREE | graph::parsing_prop::PRINT_INFO | graph::parsing_prop::SORT);
 
     int work_factor;
@@ -114,12 +111,12 @@ void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on t
 
     auto host_count = hostCountTriangles(graph.nV(), graph.nE(),graph.csr_out_offsets(), graph.csr_out_edges());
 
-    HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
-    hornets_nest::gpu::Hornet<EMPTY,EMPTY> hornet_graph(hornet_init);
+    hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
+    hornets_nest::gpu::Hornet<std::tuple<>, std::tuple<>> hornet_graph(hornet_init);
 
     hornet_graph.check_sorted_adjs();
 
-    TriangleCounting2 tc2(hornet_graph);
+    hornets_nest::TriangleCounting2 tc2(hornet_graph);
 
     tc2.init();
 
@@ -130,7 +127,7 @@ void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on t
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> diff = end - start;
-    std::cout << "Computation time:" << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
+    std::cout << "Computation time: " << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
 
     auto device_count = tc2.countTriangles();
     tc2.release();
@@ -139,6 +136,8 @@ void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on t
     ASSERT_EQ(host_count, device_count);
 
     return;
+}
+
 }
 
 class TriangleCountingTest : public HornetTest {
