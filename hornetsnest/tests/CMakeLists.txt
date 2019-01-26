@@ -13,6 +13,7 @@ include(../../compiler-util/CMakeLists.txt)
 
 set(BFS_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/bfs/bfs_test.cu")
 set(CLUSTERING_COEFFICIENT_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/clustering_coefficient/clustering_coefficient_test.cu")
+set(CONNECTED_COMPONENT_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/connected_component/connected_component_test.cu")
 set(KATZ_CENTRALITY_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/katz_centrality/katz_centrality_test.cu")
 set(PAGE_RANK_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/page_rank/page_rank_test.cu")
 set(SPMV_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/spmv/spmv_test.cu")
@@ -21,6 +22,7 @@ set(TRIANGLE_COUNTING_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/triangle_counting/tr
 
 ConfigureTest(BFS_TEST "${BFS_TEST_SRC}" hornetAlg)
 ConfigureTest(CLUSTERING_COEFFICIENT_TEST "${CLUSTERING_COEFFICIENT_TEST_SRC}" hornetAlg)
+ConfigureTest(CONNECTED_COMPONENT_TEST "${CONNECTED_COMPONENT_TEST_SRC}" hornetAlg)
 ConfigureTest(KATZ_CENTRALITY_TEST "${KATZ_CENTRALITY_TEST_SRC}" hornetAlg)
 ConfigureTest(PAGE_RANK_TEST "${PAGE_RANK_TEST_SRC}" hornetAlg)
 ConfigureTest(SPMV_TEST "${SPMV_TEST_SRC}" hornetAlg)
@@ -28,20 +30,8 @@ ConfigureTest(SSSP_TEST "${SSSP_TEST_SRC}" hornetAlg)
 ConfigureTest(TRIANGLE_COUNTING_TEST "${TRIANGLE_COUNTING_TEST_SRC}" hornetAlg)
 
 #add_executable(con-comp   test/CCTest.cu)
-#add_executable(spmv       test/SpMVTest.cu)
-#add_executable(sssp       test/SSSPTest.cu)
-#add_executable(katz       test/KatzTest.cu)
-#add_executable(dyn-katz   test/KatzDynamicTest.cu)
-#add_executable(clus-coeff test/ClusCoeffTest.cu)
-#add_executable(pr         test/PageRankTest.cu)
 
 #target_link_libraries(con-comp   hornetAlg hornet)
-#target_link_libraries(spmv       hornetAlg hornet)
-#target_link_libraries(sssp       hornetAlg hornet)
-#target_link_libraries(katz       hornetAlg hornet)
-#target_link_libraries(dyn-katz   hornetAlg hornet)
-#target_link_libraries(clus-coeff hornetAlg hornet)
-#target_link_libraries(pr         hornetAlg hornet)
 
 ###################################################################################################
 ### enable testing ################################################################################
