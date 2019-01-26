@@ -5,16 +5,14 @@
 
 namespace hornets_nest {
 
-//using triangle_t = int;
-using triangle_t = unsigned long long;
-using HornetGraph = gpu::Hornet<EMPTY, EMPTY>;
-
+using triangle_t = unsigned int;
+//using triangle_t = unsigned long long;
 
 //==============================================================================
 
-class TriangleCounting2 : public StaticAlgorithm<HornetGraph> {
+class TriangleCounting2 : public StaticAlgorithm<gpu::Hornet<EMPTY, EMPTY>> {
 public:
-    TriangleCounting2(HornetGraph& hornet);
+    TriangleCounting2(gpu::Hornet<EMPTY, EMPTY>& hornet);
     ~TriangleCounting2();
 
     void reset()    override;
