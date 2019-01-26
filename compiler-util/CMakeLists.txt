@@ -2,7 +2,7 @@
 # - set build options -----------------------------------------------------------------------------
 
 option(CUB_LIBRARY "Configure CMake to use CUB" ON) # if set to off, some test cases using CUB will not compile.
-option(RMM_LIBRARY "Configure CMake to use RMM" ON) # if set to ON, gpu::allocate invokes RMM_ALLOC, if set to OFF, gpu::allocate invokes cuMalloc (which in turn, invokes cudaMalloc)
+option(RMM_LIBRARY "Configure CMake to use RMM" OFF) # if set to ON, gpu::allocate invokes RMM_ALLOC, if set to OFF, gpu::allocate invokes cuMalloc (which in turn, invokes cudaMalloc)
 option(BUILD_TESTS "Configure CMake to build tests" ON)
 
 ###################################################################################################
