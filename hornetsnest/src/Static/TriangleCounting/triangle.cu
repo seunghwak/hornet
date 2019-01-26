@@ -16,6 +16,18 @@ using namespace hornets_nest;
 
 namespace hornets_nest {
 
+namespace {
+
+struct OPERATOR_InitTriangleCounts {
+    HostDeviceVar<TriangleData> d_triangleData;
+
+    OPERATOR (Vertex &vertex) {
+        d_triangleData().triPerVertex[vertex.id()] = 0;
+    }
+};
+
+}
+
 __device__ __forceinline__
 void initialize(degree_t diag_id,
                 degree_t u_len,
@@ -332,7 +344,7 @@ void devicecuStaticTriangleCounting(HornetDevice hornet,
     }
 }
 
-void staticTriangleCounting(HornetGraph& hornet,
+void staticTriangleCounting(gpu::Hornet<EMPTY,EMPTY>& hornet,
                         triangle_t* __restrict__ outPutTriangles,
                         int threads_per_block,
                         int number_blocks,
@@ -359,7 +371,7 @@ void staticTriangleCounting(HornetGraph& hornet,
 // -----------------------
 // -----------------------
 
-TriangleCounting::TriangleCounting(HornetGraph& hornet) :
+TriangleCounting::TriangleCounting(gpu::Hornet<EMPTY,EMPTY>& hornet) :
                                        StaticAlgorithm(hornet),
                                        hd_triangleData(hornet){
 }
@@ -367,14 +379,6 @@ TriangleCounting::TriangleCounting(HornetGraph& hornet) :
 TriangleCounting::~TriangleCounting(){
     release();
 }
-
-struct OPERATOR_InitTriangleCounts {
-    HostDeviceVar<TriangleData> d_triangleData;
-
-    OPERATOR (Vertex &vertex) {
-        d_triangleData().triPerVertex[vertex.id()] = 0;
-    }
-};
 
 void TriangleCounting::reset(){
     forAllVertices(hornet, OPERATOR_InitTriangleCounts { hd_triangleData });

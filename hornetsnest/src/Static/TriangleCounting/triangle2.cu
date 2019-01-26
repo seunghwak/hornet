@@ -21,15 +21,7 @@ New Orleans, Louisiana, 2014
 
 namespace hornets_nest {
 
-TriangleCounting2::TriangleCounting2(HornetGraph& hornet) :
-                                       StaticAlgorithm(hornet)
-
-{                                       
-}
-
-TriangleCounting2::~TriangleCounting2(){
-    release();
-}
+namespace {
 
 struct OPERATOR_InitTriangleCounts {
     triangle_t *d_triPerVertex;
@@ -70,7 +62,6 @@ struct OPERATOR_AdjIntersectionCount {
         atomicAdd(d_triPerVertex+v2.id(), count);
     }
 };
-
 
 struct OPERATOR_AdjIntersectionCountBalanced {
     triangle_t* d_triPerVertex;
@@ -122,6 +113,18 @@ struct OPERATOR_AdjIntersectionCountBalanced {
         //atomicAdd(d_triPerVertex+v.id(), count);
     }
 };
+
+}
+
+TriangleCounting2::TriangleCounting2(gpu::Hornet<EMPTY,EMPTY>& hornet) :
+                                       StaticAlgorithm(hornet)
+
+{                                       
+}
+
+TriangleCounting2::~TriangleCounting2(){
+    release();
+}
 
 void TriangleCounting2::copyTCToHost(triangle_t* h_tcs) {
     gpu::copyToHost(triPerVertex, hornet.nV(), h_tcs);
