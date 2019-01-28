@@ -8,7 +8,6 @@
 #include <StandardAPI.hpp>
 
 #include "Static/TriangleCounting/triangle.cuh"
-#include "Static/TriangleCounting/triangle2.cuh"
 
 #include "../../hornet/tests/hornet_test_fixtures.h"
 
@@ -54,51 +53,7 @@ hornets_nest::triangle_t hostCountTriangles (const hornets_nest::vid_t num_verti
     return ret;
 }
 
-void execOrg(const int argc, char *argv[]) {//use hornets_nest::TriangleCounting and based on the old TriangleCountingTest.cu file.
-    graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph(graph::structure_prop::UNDIRECTED);
-    graph.read(argv[1], graph::parsing_prop::DIRECTED_BY_DEGREE | graph::parsing_prop::SORT | graph::parsing_prop::PRINT_INFO);
-
-    auto host_count = hostCountTriangles(graph.nV(), graph.nE(),graph.csr_out_offsets(), graph.csr_out_edges());
-    std::cout << "host_count=" << host_count << std::endl;
-
-    hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
-    hornets_nest::gpu::Hornet<std::tuple<>, std::tuple<>> hornet_graph(hornet_init);
-
-    hornet_graph.check_sorted_adjs();
-
-    constexpr int blocks = 96000;
-    constexpr int sps = 192;
-    constexpr int tsp = 16;
-    constexpr int shifter = 3;
-
-    const std::vector<int> v_cutoff = { -1, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700 };//this is bad... currently, cutoff part is disabled in triangle.cu... also, host_count and device_count do not always match... not sure this is worth debugging... we may just replace hornets_nest::TriangleCounting with hornets_nest::TriangleCounting2
-
-    for (auto cutoff : v_cutoff) {
-        hornets_nest::TriangleCounting tc(hornet_graph);
-
-        tc.setInitParameters(blocks,sps,tsp);
-        tc.init();
-        tc.reset();
-
-        auto start = std::chrono::high_resolution_clock::now();
-
-        tc.run(cutoff);
-
-        auto end = std::chrono::high_resolution_clock::now();
-
-        std::chrono::duration<double> diff = end - start;
-        std::cout << "Computation time: " << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
-
-        auto device_count = tc.countTriangles();
-        tc.release();
-
-        std::cout << "cutoff=" << cutoff << " blocks=" << blocks << " sps=" << sps << " tsp=" << tsp << " shifter=" << shifter << " device_count=" << device_count << std::endl;
-    }
-
-    return;
-}
-
-void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on the old TriangleCountingTest2.cu file.
+void exec(const int argc, char* argv[]) {
     graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph(graph::structure_prop::UNDIRECTED);
     graph.read(argv[1], graph::parsing_prop::DIRECTED_BY_DEGREE | graph::parsing_prop::PRINT_INFO | graph::parsing_prop::SORT);
 
@@ -116,21 +71,21 @@ void exec2(const int argc, char* argv[]) {//use TriangleCounting2 and based on t
 
     hornet_graph.check_sorted_adjs();
 
-    hornets_nest::TriangleCounting2 tc2(hornet_graph);
+    hornets_nest::TriangleCounting tc(hornet_graph);
 
-    tc2.init();
+    tc.init();
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    tc2.run(work_factor);
+    tc.run(work_factor);
 
     auto end = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> diff = end - start;
     std::cout << "Computation time: " << diff.count() * 1000/* s to ms */ << " ms" << std::endl;
 
-    auto device_count = tc2.countTriangles();
-    tc2.release();
+    auto device_count = tc.countTriangles();
+    tc.release();
 
     std::cout << "host_count=" << host_count << " device_count=" << device_count << std::endl;
     ASSERT_EQ(host_count, device_count);
@@ -151,14 +106,9 @@ protected:
 int TriangleCountingTest::argc = 0;
 char** TriangleCountingTest::argv = nullptr;
 
-TEST_F(TriangleCountingTest, TriangleCountingOrgTest) {
+TEST_F(TriangleCountingTest, TriangleCountingTest) {
     ASSERT_TRUE(TriangleCountingTest::argc >= 2);
-    execOrg(TriangleCountingTest::argc, TriangleCountingTest::argv);
-}
-
-TEST_F(TriangleCountingTest, TriangleCounting2Test) {
-    ASSERT_TRUE(TriangleCountingTest::argc >= 2);
-    exec2(TriangleCountingTest::argc, TriangleCountingTest::argv);
+    exec(TriangleCountingTest::argc, TriangleCountingTest::argv);
 }
 
 int main(int argc, char* argv[]) {

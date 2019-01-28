@@ -51,7 +51,7 @@
 
 
 #include "Static/ClusteringCoefficient/cc.cuh"
-#include "Static/TriangleCounting/triangle2.cuh"
+#include "Static/TriangleCounting/triangle.cuh"
 
 using namespace xlib;
 using namespace gpu;
@@ -59,13 +59,13 @@ using namespace gpu;
 namespace hornets_nest {
 
 ClusteringCoefficient::ClusteringCoefficient(HornetGraph& hornet) :
-                                        TriangleCounting2(hornet)
+                                        TriangleCounting(hornet)
                                        // StaticAlgorithm(hornet)                                      
 {
 }
 
 ClusteringCoefficient::~ClusteringCoefficient(){
-    TriangleCounting2::release();
+    TriangleCounting::release();
     release();
 }
 
@@ -86,11 +86,11 @@ struct OPERATOR_LocalClusteringCoefficients {
 
 
 void ClusteringCoefficient::reset(){
-    TriangleCounting2::reset();
+    TriangleCounting::reset();
 }
 #include <cub/cub.cuh>
 void ClusteringCoefficient::run(){
-    TriangleCounting2::run();
+    TriangleCounting::run();
     forAllVertices(hornet, OPERATOR_LocalClusteringCoefficients { triPerVertex,d_ccLocal }); 
 
     int _num_items = hornet.nV();
@@ -119,7 +119,7 @@ void ClusteringCoefficient::init(){
     gpu::allocate(d_ccLocal, hornet.nV());
     gpu::allocate(d_ccGlobal, 1);
 
-    TriangleCounting2::init();
+    TriangleCounting::init();
     reset();
 }
 

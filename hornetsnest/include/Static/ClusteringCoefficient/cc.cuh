@@ -2,7 +2,7 @@
 
 #include "HornetAlg.hpp"
 
-#include "Static/TriangleCounting/triangle2.cuh"
+#include "Static/TriangleCounting/triangle.cuh"
 
 
 namespace hornets_nest {
@@ -12,7 +12,7 @@ using HornetGraph = gpu::Hornet<EMPTY, EMPTY>;
 using clusterCoeff_t =  float;
 //==============================================================================
 
-class ClusteringCoefficient : public TriangleCounting2 {
+class ClusteringCoefficient : public TriangleCounting {
 public:
     ClusteringCoefficient(HornetGraph& hornet);
     ~ClusteringCoefficient();
