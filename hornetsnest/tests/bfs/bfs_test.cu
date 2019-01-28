@@ -14,14 +14,12 @@
 
 #include <Util/CommandLineParam.hpp>
 
-#include "Static/BreadthFirstSearch/TopDown.cuh"
-#include "Static/BreadthFirstSearch/TopDown2.cuh"
+#include "Static/BreadthFirstSearch/bfs_top_down.cuh"
 
 #include "../../hornet/tests/hornet_test_fixtures.h"
 
 namespace {
 
-template<typename TBfsAlg>
 void exec(int argc, char* argv[]) {
     graph::GraphStd<hornets_nest::vid_t, hornets_nest::eoff_t> graph;
     hornets_nest::CommandLineParam cmd(graph, argc, argv, false);
@@ -29,7 +27,7 @@ void exec(int argc, char* argv[]) {
     hornets_nest::HornetInit hornet_init(graph.nV(), graph.nE(), graph.csr_out_offsets(), graph.csr_out_edges());
     hornets_nest::HornetGraph hornet_graph(hornet_init);
 
-    TBfsAlg bfs_top_down(hornet_graph);
+    hornets_nest::BfsTopDown bfs_top_down(hornet_graph);
 
     auto root = graph.max_out_degree_id();
     bfs_top_down.set_parameters(root);
@@ -50,7 +48,7 @@ void exec(int argc, char* argv[]) {
 
 }
 
-class BFSTest : public HornetTest {
+class BfsTest : public HornetTest {
 public:
     static int argc;
     static char** argv;
@@ -58,23 +56,18 @@ public:
 protected:
 };
 
-int BFSTest::argc = 0;
-char** BFSTest::argv = nullptr;
+int BfsTest::argc = 0;
+char** BfsTest::argv = nullptr;
 
-TEST_F(BFSTest, BFSTopDownTest) {
-    ASSERT_TRUE(BFSTest::argc >= 2);
-    exec<hornets_nest::BfsTopDown>(BFSTest::argc, BFSTest::argv);
-}
-
-TEST_F(BFSTest, BFSTopDown2Test) {
-    ASSERT_TRUE(BFSTest::argc >= 2);
-    exec<hornets_nest::BfsTopDown2>(BFSTest::argc, BFSTest::argv);
+TEST_F(BfsTest, BfsTopDownTest) {
+    ASSERT_TRUE(BfsTest::argc >= 2);
+    exec(BfsTest::argc, BfsTest::argv);
 }
 
 int main(int argc, char* argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
-    BFSTest::argc = argc;
-    BFSTest::argv = argv;
+    BfsTest::argc = argc;
+    BfsTest::argv = argv;
     return RUN_ALL_TESTS();
 }
 

@@ -48,10 +48,10 @@ using HornetGraph = gpu::Csr<EMPTY, EMPTY>;
 
 using dist_t = int;
 
-class BfsTopDown2 : public StaticAlgorithm<HornetGraph> {
+class BfsTopDown : public StaticAlgorithm<HornetGraph> {
 public:
-    BfsTopDown2(HornetGraph& hornet);
-    ~BfsTopDown2();
+    BfsTopDown(HornetGraph& hornet);
+    ~BfsTopDown();
 
     void reset()    override;
     void run()      override;

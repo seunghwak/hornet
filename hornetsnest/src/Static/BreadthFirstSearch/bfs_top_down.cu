@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * </blockquote>}
  */
-#include "Static/BreadthFirstSearch/TopDown2.cuh"
+#include "Static/BreadthFirstSearch/bfs_top_down.cuh"
 #include "Auxilary/DuplicateRemoving.cuh"
 #include <Graph/GraphStd.hpp>
 #include <Graph/BFS.hpp>
@@ -79,11 +79,11 @@ struct BFSOperatorAtomic {                  //deterministic
     }
 };
 //------------------------------------------------------------------------------
-/////////////////
-// BfsTopDown2 //
-/////////////////
+////////////////
+// BfsTopDown //
+////////////////
 
-BfsTopDown2::BfsTopDown2(HornetGraph& hornet) :
+BfsTopDown::BfsTopDown(HornetGraph& hornet) :
                                  StaticAlgorithm(hornet),
                                  queue(hornet, 5),
                                  load_balancing(hornet) {
@@ -91,11 +91,11 @@ BfsTopDown2::BfsTopDown2(HornetGraph& hornet) :
     reset();
 }
 
-BfsTopDown2::~BfsTopDown2() {
+BfsTopDown::~BfsTopDown() {
     gpu::free(d_distances);
 }
 
-void BfsTopDown2::reset() {
+void BfsTopDown::reset() {
     current_level = 1;
     queue.clear();
 
@@ -103,13 +103,13 @@ void BfsTopDown2::reset() {
     forAllnumV(hornet, [=] __device__ (int i){ distances[i] = INF; } );
 }
 
-void BfsTopDown2::set_parameters(vid_t source) {
+void BfsTopDown::set_parameters(vid_t source) {
     bfs_source = source;
     queue.insert(bfs_source);               // insert bfs source in the frontier
     gpu::memsetZero(d_distances + bfs_source);  //reset source distance
 }
 /*
-void BfsTopDown2::run() {
+void BfsTopDown::run() {
     while (queue.size() > 0) {
         forAllEdges(hornet, queue, BFSOperator1 { d_distances, queue },
                     load_balancing);
@@ -119,7 +119,7 @@ void BfsTopDown2::run() {
     }
 }*/
 
-void BfsTopDown2::run() {
+void BfsTopDown::run() {
     while (queue.size() > 0) {
         forAllEdges(hornet, queue,
                     BFSOperatorAtomic { current_level, d_distances, queue },
@@ -129,12 +129,12 @@ void BfsTopDown2::run() {
     }
 }
 
-void BfsTopDown2::release() {
+void BfsTopDown::release() {
     gpu::free(d_distances);
     d_distances = nullptr;
 }
 
-bool BfsTopDown2::validate() {
+bool BfsTopDown::validate() {
     std::cout << "\nTotal enqueue vertices: "
               << xlib::format(queue.enqueue_items())
               << std::endl;
