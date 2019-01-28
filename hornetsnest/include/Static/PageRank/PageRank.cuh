@@ -47,54 +47,51 @@ using HornetGPU = gpu::Hornet<EMPTY, EMPTY>;
 using pr_t = float;
 
 struct PrData {
-	pr_t* prev_pr;
-	pr_t* curr_pr;
-	pr_t* abs_diff;
+    pr_t* prev_pr;
+    pr_t* curr_pr;
+    pr_t* abs_diff;
 
-	pr_t* reduction_out;
-	pr_t* contri;
+    pr_t* reduction_out;
+    pr_t* contri;
 
-	int   iteration;
-	int   iteration_max;
-	int   nV;
-	pr_t  threshold;
-	pr_t  damp;
-	pr_t  normalized_damp;
+    int iteration;
+    int iteration_max;
+    int nV;
+    pr_t threshold;
+    pr_t damp;
+    pr_t normalized_damp;
 };
 
 // Label propogation is based on the values from the previous iteration.
 class StaticPageRank : public StaticAlgorithm<HornetGPU> {
 public:
-    StaticPageRank(HornetGPU& hornet,
-	            	int  iteration_max = 20,
-	            	pr_t     threshold = 0.001f,
-	            	pr_t          damp = 0.85f,
-		        	bool  isUndirected = false);
+    StaticPageRank(HornetGPU& hornet, int iteration_max = 20,
+                   pr_t threshold = 0.001f, pr_t damp = 0.85f,
+                   bool isUndirected = false);
+  
     ~StaticPageRank();
 
-    void reset()    override;
-    void run()      override;
-    void release()  override;
+    void reset() override;
+    void run() override;
+    void release() override;
     bool validate() override;
 
-	void setInputParameters(int iteration_max = 20,
-                            pr_t    threshold = 0.001f,
-                            pr_t         damp = 0.85f,
-		                    bool isUndirected  = false);
+    void setInputParameters(int iteration_max = 20, pr_t threshold = 0.001f,
+                            pr_t damp = 0.85f, bool isUndirected  = false);
 
-	int get_iteration_count();
+    int get_iteration_count();
 
-	const pr_t* get_page_rank_score_host();
+    const pr_t* get_page_rank_score_host();
 
-	void printRankings();
+    void printRankings();
 
     PrData pr_data();
 
 private:
-    load_balancing::BinarySearch 	load_balancing;
-    HostDeviceVar<PrData>       	hd_prdata;
-    pr_t*                       	host_page_rank { nullptr };
-    bool 							isUndirected;
+    load_balancing::BinarySearch load_balancing;
+    HostDeviceVar<PrData> hd_prdata;
+    pr_t* host_page_rank { nullptr };
+    bool isUndirected;
 };
 
 } // hornets_nest namespace
