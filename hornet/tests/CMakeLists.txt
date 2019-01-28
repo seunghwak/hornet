@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+﻿cmake_minimum_required(VERSION 3.12 FATAL_ERROR) #language level CUDA support was added in CMake 3.8 and the current implementation of Google test requires 3.12+
 
 project(HORNET_TESTS LANGUAGES C CXX CUDA)
 
@@ -29,10 +29,10 @@ ConfigureTest(MEM_OP_TEST "${MEM_OP_TEST_SRC}" hornet)
 ###################################################################################################
 # - rmm tests -------------------------------------------------------------------------------------
 
-#if(RMM_LIBRARY)
+if(RMM_LIBRARY)
 set(RMM_TEST_SRC "${CMAKE_CURRENT_SOURCE_DIR}/rmm/rmm_test.cu")
 ConfigureTest(RMM_TEST "${RMM_TEST_SRC}" hornet)
-#endif
+endif()
 
 ###################################################################################################
 # - warp (scan & reduce) tests --------------------------------------------------------------------

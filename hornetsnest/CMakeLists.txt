@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR) #language level CUDA support was added in CMake 3.8
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR) #language level CUDA support was added in CMake 3.8 and the current implementation of Google test requires 3.12+
 
 set(PROJECT "HornetAlg")
 project(${PROJECT} LANGUAGES C CXX CUDA)
