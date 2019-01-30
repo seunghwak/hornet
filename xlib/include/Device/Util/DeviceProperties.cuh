@@ -374,7 +374,7 @@ public:
     static int smem_per_block_occ(int num_blocks_per_SM) noexcept;
 
 private:
-    static constexpr int MAX_GPUS = 8;
+    static constexpr int MAX_GPUS = 32;//TODO(Seunghwa Kang): this is a bandaid and not a proper fix (there can be a system with more than 32 GPUs in the future, and for systems with only few GPUs, this wastes memory), but I am planning to carve out the entire xlib part, so I may not spend too much time fixing this.
 
     static int  _num_sm[MAX_GPUS];
     static int  _smem_per_SM[MAX_GPUS];
