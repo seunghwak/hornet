@@ -47,7 +47,7 @@ KatzCentralityDynamic::KatzCentralityDynamic(HornetGraph& hornet,
                                              degree_t max_degree) :
                                    StaticAlgorithm(hornet),
                                    load_balancing(hornet),
-                                   inverted_graph(inverted_graph),
+                                   inverted_graph(inverted_graph_),
                                    is_directed(false),
                                    kc_static(hornet, max_iteration, K,
                                              max_degree, false) {
@@ -73,7 +73,7 @@ KatzCentralityDynamic::KatzCentralityDynamic(HornetGraph& hornet,
                                              degree_t max_degree) :
                                    StaticAlgorithm(hornet),
                                    load_balancing(hornet),
-                                   inverted_graph(inverted_graph),
+                                   inverted_graph(hornet),
                                    is_directed(true),
                                    kc_static(inverted_graph, max_iteration, K,
                                              max_degree, true) {
