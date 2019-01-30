@@ -47,7 +47,7 @@ KatzCentralityDynamic::KatzCentralityDynamic(HornetGraph& hornet,
                                              degree_t max_degree) :
                                    StaticAlgorithm(hornet),
                                    load_balancing(hornet),
-                                   inverted_graph(inverted_graph),
+                                   inverted_graph_(inverted_graph),
                                    is_directed(false),
                                    kc_static(hornet, max_iteration, K,
                                              max_degree, false) {
@@ -73,9 +73,9 @@ KatzCentralityDynamic::KatzCentralityDynamic(HornetGraph& hornet,
                                              degree_t max_degree) :
                                    StaticAlgorithm(hornet),
                                    load_balancing(hornet),
-                                   inverted_graph(hornet),
+                                   inverted_graph_(hornet),
                                    is_directed(true),
-                                   kc_static(inverted_graph, max_iteration, K,
+                                   kc_static(inverted_graph_, max_iteration, K,
                                              max_degree, true) {
 
     hd_katzdata().active_queue.initialize(hornet);
@@ -151,10 +151,10 @@ void KatzCentralityDynamic::processUpdate(BatchUpdate& batch_update,
                         load_balancing );
         }
         else {
-            forAllEdges(inverted_graph, hd_katzdata().active_queue,
+            forAllEdges(inverted_graph_, hd_katzdata().active_queue,
                         FindNextActive { hd_katzdata }, load_balancing);
             hd_katzdata.sync();
-            forAllEdges(inverted_graph, hd_katzdata().active_queue,
+            forAllEdges(inverted_graph_, hd_katzdata().active_queue,
                         UpdateActiveNewPaths { hd_katzdata }, load_balancing);
         }
         hd_katzdata.sync(); // Syncing queue info
